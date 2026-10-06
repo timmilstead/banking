@@ -1,3 +1,23 @@
 spring:
   application:
     name: banking
+
+  # TODO: Use H2 (in Postgres mode) for testing under a different spring profile
+  datasource:
+    url: jdbc:postgresql://localhost:5432/savingsaccounts
+    # Set in env/secrets/config map etc
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      # TODO: Great for testing, but drops table(s) on exit
+      # TODO: Use flyway
+      ddl-auto: create-drop
+    show-sql: true
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect

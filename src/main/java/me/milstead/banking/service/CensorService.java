@@ -7,12 +7,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * Service for checking strings don't contain offensive words.
+ * Service for checking strings for offensive words.
  */
 @Service
 public class CensorService {
 
-    // TODO: To save blushes one could use hashes instead
+    // Obviously these are real offensive words
+    // TODO: To save blushes one could use hashes
     private static final List<String> OFFENSIVE_WORDS = List.of (
             "door",
             "trade",
@@ -21,6 +22,11 @@ public class CensorService {
             "flax"
     );
 
+    /**
+     * Validate whether the specified string contains any offensive words.
+     * @param str The string to check.
+     * @throws CensorException If there are any offensive words.
+     */
     public void validate(String str) {
         if (StringUtils.isBlank(str)) {
             return;

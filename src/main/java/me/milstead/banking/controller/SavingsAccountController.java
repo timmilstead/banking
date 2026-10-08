@@ -17,8 +17,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import java.net.URI;
 import java.util.Optional;
 
+// TODO: Security! e.g. JWT - check customer in JWT matches customer number in requests
+
 /**
  * Rest API for creating and getting savings accounts.
+ * TODO: For normal projects I prefer to create code from OpenApi specs using the Swagger generator.
  */
 @Controller
 @Slf4j
@@ -33,25 +36,32 @@ public class SavingsAccountController {
      * @return 201 i
      */
     @PostMapping("/api/v1/savings-accounts")
-    public ResponseEntity<Void> post(@Valid @RequestBody CreateSavingsAccountRequest request) {
-        SavingsAccount savingsAccount = SavingsAccount.builder()
+    public ResponseEntity<GetSavingsAccountResponse> post(@Valid @RequestBody CreateSavingsAccountRequest request) {
+        SavingsAccount requestSavingsAccount = SavingsAccount.builder()
                 .customerName(request.getCustomerName())
                 .nickname(request.getNickname())
                 .build();
-        SavingsAccount savedSavingsAccount = savingsAccountService.createSavingsAccount(savingsAccount);
-        String formattedStr = String.format("/api/v1/savings-accounts/%d", savedSavingsAccount.getId());
+        // Actually JPA will update requestSavingsAccount too.
+        SavingsAccount createdSavingsAccount = savingsAccountService.createSavingsAccount(requestSavingsAccount);
+
+        String formattedStr = String.format("/api/v1/savings-accounts/%d", createdSavingsAccount.getId());
         URI uri = URI.create(formattedStr);
-        return ResponseEntity.created(uri).build();
+        return ResponseEntity.created(uri).body(domainToDto(createdSavingsAccount));
     }
 
-    @GetMapping("/api/v2/savings-account/{id}")
+    /**
+     * Get a savings account.
+     * @param id ID of the savings account.
+     * @return The savings account or 404 if it doesn't exist.
+     */
+    @GetMapping("/api/v1/savings-accounts/{id}")
     public ResponseEntity<GetSavingsAccountResponse> get(@PathVariable Long id) {
         Optional<SavingsAccount> savingsAccount = savingsAccountService.get(id);
-        Optional<GetSavingsAccountResponse> response = savingsAccount.map(this::convert);
+        Optional<GetSavingsAccountResponse> response = savingsAccount.map(this::domainToDto);
         return ResponseEntity.of(response);
     }
 
-    private GetSavingsAccountResponse convert(SavingsAccount savingsAccount) {
+    private GetSavingsAccountResponse domainToDto(SavingsAccount savingsAccount) {
         return GetSavingsAccountResponse.builder()
                 .id(savingsAccount.getId())
                 .accountNumber(savingsAccount.getAccountNumber())

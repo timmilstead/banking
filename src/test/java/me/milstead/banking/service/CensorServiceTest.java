@@ -1,6 +1,6 @@
 package me.milstead.banking.service;
 
-import me.milstead.banking.exception.CensorException;
+import me.milstead.banking.error.CensorException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

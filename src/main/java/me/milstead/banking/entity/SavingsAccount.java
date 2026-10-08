@@ -2,14 +2,18 @@ package me.milstead.banking.entity;
 
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import org.hibernate.proxy.HibernateProxy;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /**
- * Represents a customer savings account in the database and domain services.
+ * Represents a customer savings account in the database and domain
+ * (app too small for separate domain and entity classes).
+ * Not used for REST DTOs - translated first.
  */
 @Getter
 @Setter
@@ -18,7 +22,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @ToString
-// Don't use @Data we want to write our own JPA compatible equals and hashCode.
+// Don't use @Data we don't want Lombok's JPA incompatible equals and hashCode implementations.
 public class SavingsAccount {
 
     /**
@@ -41,16 +45,40 @@ public class SavingsAccount {
      * Customer name - would have been better to use an ID here.
      * Mandatory.
      */
-    @Column(nullable = false, unique = true)
-    @NotNull
+    @Column(nullable = false, unique = false)
+    @NotBlank
     private String customerName;
 
     /**
      * Optional 5 to 30 characters.
      */
-    @Column(nullable = true, length = 30)
+    @Column(nullable = true, length = 30, unique = false)
     @Size(min = 5, max = 30)
     @Nullable
     private String nickname;
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null) return false;
+
+        Class<?> oEffectiveClass = o instanceof HibernateProxy
+                ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass()
+                : o.getClass();
+        Class<?> thisEffectiveClass = this instanceof HibernateProxy
+                ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass()
+                : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) return false;
+
+        SavingsAccount that = (SavingsAccount) o;
+        return getAccountNumber() != null && Objects.equals(getAccountNumber(), that.getAccountNumber());
+    }
+
+    @Override
+    public final int hashCode() {
+        return this instanceof HibernateProxy
+                ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode()
+                : getClass().hashCode();
+    }
 
 }

@@ -1,22 +1,23 @@
 package me.milstead.banking.dto;
 
 import jakarta.annotation.Nullable;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * DTO for creating savings accounts.
+ */
 @Data
 @NoArgsConstructor
 public class CreateSavingsAccountRequest {
 
-    @NotNull
+    @NotBlank
     private String customerName;
 
     @Nullable
-    @Min(5)
-    @Max(30)
+    @Size(min = 5, max = 30)
     private String nickname;
 
 }

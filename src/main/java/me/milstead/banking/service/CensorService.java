@@ -1,6 +1,7 @@
 package me.milstead.banking.service;
 
-import me.milstead.banking.exception.CensorException;
+import lombok.extern.slf4j.Slf4j;
+import me.milstead.banking.error.CensorException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +11,7 @@ import java.util.List;
  * Service for checking strings for offensive words.
  */
 @Service
+@Slf4j
 public class CensorService {
 
     // Obviously these are real offensive words
@@ -28,12 +30,18 @@ public class CensorService {
      * @throws CensorException If there are any offensive words.
      */
     public void validate(String str) {
+        if (log.isTraceEnabled()) {
+            log.trace("str = {}", str);
+        }
         if (StringUtils.isBlank(str)) {
             return;
         }
         String[] words = str.split("\\s");
         for (String word : words) {
             if (OFFENSIVE_WORDS.contains(word.toLowerCase())) {
+                if (log.isTraceEnabled()) {
+                    log.trace("str, {}, contains offensive word, {}", str, word);
+                }
                 throw new CensorException();
             }
         }

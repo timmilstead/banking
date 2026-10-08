@@ -2,13 +2,16 @@ package me.milstead.banking.service;
 
 import jakarta.validation.ConstraintViolationException;
 import me.milstead.banking.entity.SavingsAccount;
-import me.milstead.banking.exception.CensorException;
+import me.milstead.banking.error.CensorException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Test the savings account service.
+ */
 @SpringBootTest
 class SavingsAccountServiceTest {
 
@@ -21,13 +24,23 @@ class SavingsAccountServiceTest {
     }
 
     @Test
-    void testCreateWithInvalidCustomerName() {
+    void testCreateWithNullCustomerName() {
         SavingsAccount savingsAccount = SavingsAccount.builder()
                 .customerName(null)
                 .nickname(null)
                 .build();
         assertThrows(ConstraintViolationException.class, ()->savingsAccountService.createSavingsAccount(savingsAccount));
     }
+
+    @Test
+    void testCreateWithBlankCustomerName() {
+        SavingsAccount savingsAccount = SavingsAccount.builder()
+                .customerName("")
+                .nickname(null)
+                .build();
+        assertThrows(ConstraintViolationException.class, ()->savingsAccountService.createSavingsAccount(savingsAccount));
+    }
+
 
     @Test
     void testCreateWithOffensiveNickname() {
